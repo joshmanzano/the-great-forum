@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{> headerResources}}
+  <title>The Forum</title>
+</head>
+
+<body>
+  {{#if uname}} {{> signedNavBar}} {{else}} {{> unsignedNavBar}} {{/if}}
+  <main role="main" class="container">
+    <div class="starter-template">
+      <h2>About The Developers</h2>
+
+      <div class="row justify-content-around">
+        <div class="col-sm">
+          <div class="text-center"><img src="./nicohos.png" width="250" height="150" class="avatar"></div>
+          <span class="font-weight-bold">@nico</span><br>Integer efficitur vel velit vel varius. Etiam nunc eros, commodo
+          in nisl eu, sagittis mattis sapien.
+        </div>
+        <div class="col-sm">
+          <div class="text-center"><img src="./josh1.jpg" width="250" height="150" class="avatar"></div>
+          <span class="font-weight-bold">@josh</span><br> Nulla id sem a arcu aliquam facilisis non at libero. Sed et metus
+          vel justo pellentesque gravida. Aliquam a magna placerat, mollis nunc nec, rutrum nisl.
+        </div>
+        <div class="col-sm">
+          <div class="text-center"><img src="./kayehos.png" width="250" height="150" class="avatar"></div>
+          <span class="font-weight-bold">@kaye</span><br>Aliquam non ultrices sapien, eu rutrum enim. Donec lacinia cursus
+          posuere.
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <h2>About the Site</h2>
+        <p>This website is one of the minumum requirements for WEBAPDE. The Forum allows you to interact and discuss anything
+          under the sun with others (similar to Reddit)</p>
+        <h3>NPM Packages</h3>
+        <p>express, cool-ascii-faces, path, body-parser, request, hbs, express-session, cookie-parser, bcrypt, fs, multer,
+          pretty-ms, time-stamp, mongoose
+        </p>
+        {{#each coolfaces}} {{this}} {{/each}}
+      </div>
+    </div>
+  </main>
+  {{> footer}} {{> scriptResources}}
+
+</body>
+
+</html>

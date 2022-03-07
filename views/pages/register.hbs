@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{> headerResources}}
+  <link href="./stylesheets/register.css" rel="stylesheet">
+  <title>The Forum</title>
+</head>
+
+<body class="text-center">
+
+  <form action="user/register" id="registerform" class="form-register" method="post" enctype="multipart/form-data">
+    <img class="mb-4 rounded-circle" src="./kaye.JPG" width="72" height="72">
+    <div class="h4 mb-3 font-weight-normal">Register a new account</div>
+    <div class="form-group">
+      <label for="inputEmail">Email address</label>
+      <input name="emailAddress" type="email" id="inputEmail" class="form-control" required autofocus>
+    </div>
+    <div class="form-group">
+      <label for="inputUsername">Username</label>
+      <input name="username" type="text" id="inputUsername" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="inputPassword">Password</label>
+      <input name="password" type="password" id="inputPassword" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="inputConfirmPassword">Confirm password</label>
+      <input type="password" id="inputConfirmPassword" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="inputBio">Short bio (optional)</label>
+      <textarea name="shortBio" class="form-control" id="inputBio" rows="2"></textarea>
+    </div>
+
+    {{!--
+    <div class="form-group"> --}}
+      <div class="input-group mb-3">
+
+        <div class="input-group-prepend">
+          <span class="input-group-text">Avatar</span>
+        </div>
+
+        <img id="avatarPreview" width="100" height="100" class="rounded" src="./user/avatar/default" />
+      </div>
+
+      <div class="input-group mb-2">
+        <div class="text-left custom-file">
+          <input name="avatar" type="file" class="custom-file-input" accept=".png, .jpg, .jpeg" id="inputAvatar">
+          <label class="custom-file-label" for="inputAvatar" id="fileLabel">Choose file</label>
+        </div>
+      </div>
+      {{!--
+    </div> --}}
+
+
+    <!-- <p style="text-align: left; margin-left: 5px"> Choose Avatar</p> -->
+    <!-- <input type="file"> -->
+
+
+    <div class="checkbox mb-3">
+      <label>
+        <input name="rememberMe" id="inputRemember" type="checkbox" value="remember-me"> Remember me
+      </label>
+    </div>
+    <button id="registerbtn" class="nav-link btn btn-lg btn-primary btn-block">Register</button>
+  </form>
+
+  <div class="modal fade" id="errorModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Registration error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">A user with the same username or email already exists. Please try again.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-dismiss="modal">Retry</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+
+  <div class="modal fade" id="uploadErrorModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Registration error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You must upload a valid avatar image. Please try again.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" data-dismiss="modal">Retry</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  {{> scriptResources}}
+
+  <script>
+    var safe = false;
+
+    $(document).ready(function () {
+
+      $("#registerbtn").on("click", function (evt) {
+        evt.preventDefault();
+
+        // set to back to default black
+        $('label[for=inputUsername]').css({ color: 'black' });
+        $('label[for=inputEmail]').css({ color: 'black' });
+        $('label[for=inputPassword]').css({ color: 'black' });
+        $('label[for=inputConfirmPassword]').css({ color: 'black' });
+
+        var username = $("#inputUsername").val();
+        var password = $("#inputPassword").val();
+        var email2 = $("#inputEmail").val();
+        var cpassword = $("#inputConfirmPassword").val();
+
+        if (!username || !password || !email2 || !cpassword) {
+          var data = "Please fill in all required fields.";
+          var myHeading = "<p>" + data + "</p>";
+          $(".modal-body").html(myHeading);
+          $("#errorModal").modal("show");
+          if (!username) {
+
+            $('label[for=inputUsername]').css({ color: 'red' });
+          }
+          if (!password) {
+
+            $('label[for=inputPassword]').css({ color: 'red' });
+          }
+          if (!email2) {
+
+            $('label[for=inputEmail]').css({ color: 'red' });
+          }
+
+          if (!cpassword) {
+
+            $('label[for=inputConfirmPassword]').css({ color: 'red' });
+          }
+
+        }
+        else if (password != cpassword) {
+          var data = "Password must match. Kindly check";
+          var myHeading = "<p>" + data + "</p>";
+          $(".modal-body").html(myHeading);
+          $("#errorModal").modal("show");
+
+          $('label[for=inputPassword]').css({ color: 'red' });
+          $('label[for=inputConfirmPassword]').css({ color: 'red' });
+        } else {
+
+          $.post("user/checkregister", {
+            uname: username,
+            email: email2,
+            password: password
+          }, (checkUser) => {
+
+            if (checkUser == "1") {
+
+
+              $("#errorModal").modal("show");
+              $('label[for=inputUsername]').css({ color: 'red' });
+              $('label[for=inputEmail]').css({ color: 'black' });
+
+
+            } else if (checkUser == "2") {
+
+              $("#errorModal").modal("show");
+              $('label[for=inputUsername]').css({ color: 'black' });
+              $('label[for=inputEmail]').css({ color: 'red' });
+
+            } else {
+              if (safe || $("#fileLabel").text() === "Choose file")
+                $('#registerform').submit();
+              else
+                $("#uploadErrorModal").modal("show");
+
+            }
+          }
+          )
+        }
+      });
+
+      $('#inputAvatar').on('change', function () {
+        //get the file name
+        var fileName = $('input[type=file]').val().split('\\').pop();
+        safe = false
+
+        //check extension
+        var idxDot = fileName.lastIndexOf(".") + 1;
+        var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+        if (extFile == "jpg" || extFile == "jpeg" || extFile == "png") {
+          safe = true
+          document.getElementById('avatarPreview').src = window.URL.createObjectURL(this.files[0])
+        }
+
+        //replace the "Choose a file" label
+        $(this).next('.custom-file-label').html(fileName);
+      });
+
+    });
+  </script>
+
+</body>
+
+</html>
+{{!-- $(".downloadupaddinvoice").click(function(){ var filename = $('#inputAvatar').val(); if (filename == "" || filename
+== null) { alert('Error'); }else { var file = document.getElementById('inputAvatar').files[0]; var filename = document.getElementById('inputAvatar').files[0].name;
+var blob = new Blob([file]); var url = URL.createObjectURL(blob); $(this).attr({ 'download': filename, 'href': url}); filename
+= ""; } }) --}}

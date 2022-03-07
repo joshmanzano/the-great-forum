@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{> headerResources}}
+
+  <title>The Forum</title>
+
+  <link href="./stylesheets/loading.css" rel="stylesheet">
+
+  <style>
+    .submitLink {
+      background-color: transparent;
+      text-decoration: underline;
+      border: none;
+      color: blue;
+      cursor: pointer;
+    }
+
+    #loading-posts {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  {{#if uname}} {{> signedHomeNavBar}} {{else}} {{> unsignedNavBar}} {{/if}}
+  <main role="main" class="container">
+    <div class="starter-template">
+
+      {{#if uname}}
+      <div class="sort d-flex flex-fill-1 mb-3">
+        <a href="post/create" class="mr-auto btn btn-outline-success">
+          <i class="material-icons md-18">add</i> Create post</a>
+        You searched for: {{searchTerm}} {{!-- <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">Sort posts by</button>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="javascript:void(0)" id="sortByDate">Date Created</a>
+          <a class="dropdown-item" href="javascript:void(0)" id="sortByPopularity">Popularity</a>
+        </div> --}}
+      </div>
+      {{else}}
+      <div class="sort d-flex flex-fill-1 flex-row-reverse">
+        You searched for: {{searchTerm}}
+      </div>
+      {{/if}}
+
+      <ul id="postContainer" class="list-unstyled"></ul>
+
+      <div id="loading-posts">
+        <div class="d-flex flex-row mb-3 media post">
+          <div class="mr-3 actions">
+            <i class="material-icons md-18 md-dark">arrow_upward</i>
+            <span class="votes1"></span>
+            <i class="material-icons md-18 md-dark">arrow_downward</i>
+          </div>
+          <div class="d-flex flex-column ml-1">
+            <div class="text">
+              <div class="title"></div>
+              <div class="text-line"></div>
+              <div class="text-line"></div>
+              <div>
+                <span class="text-footer1"></span>
+                <span class="text-footer2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-row mb-3 media post">
+          <div class="mr-3 actions">
+            <i class="material-icons md-18 md-dark">arrow_upward</i>
+            <span class="votes1"></span>
+            <i class="material-icons md-18 md-dark">arrow_downward</i>
+          </div>
+          <div class="d-flex flex-column ml-1">
+            <div class="text">
+              <div class="title"></div>
+              <div class="text-line"></div>
+              <div class="text-line"></div>
+              <div>
+                <span class="text-footer1"></span>
+                <span class="text-footer2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-row mb-3 media post">
+          <div class="mr-3 actions">
+            <i class="material-icons md-18 md-dark">arrow_upward</i>
+            <span class="votes1"></span>
+            <i class="material-icons md-18 md-dark">arrow_downward</i>
+          </div>
+          <div class="d-flex flex-column ml-1">
+            <div class="text">
+              <div class="title"></div>
+              <div class="text-line"></div>
+              <div class="text-line"></div>
+              <div>
+                <span class="text-footer1"></span>
+                <span class="text-footer2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-row mb-3 media post">
+          <div class="mr-3 actions">
+            <i class="material-icons md-18 md-dark">arrow_upward</i>
+            <span class="votes1"></span>
+            <i class="material-icons md-18 md-dark">arrow_downward</i>
+          </div>
+          <div class="d-flex flex-column ml-1">
+            <div class="text">
+              <div class="title"></div>
+              <div class="text-line"></div>
+              <div class="text-line"></div>
+              <div>
+                <span class="text-footer1"></span>
+                <span class="text-footer2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-row mb-3 media post">
+          <div class="mr-3 actions">
+            <i class="material-icons md-18 md-dark">arrow_upward</i>
+            <span class="votes1"></span>
+            <i class="material-icons md-18 md-dark">arrow_downward</i>
+          </div>
+          <div class="d-flex flex-column ml-1">
+            <div class="text">
+              <div class="title"></div>
+              <div class="text-line"></div>
+              <div class="text-line"></div>
+              <div>
+                <span class="text-footer1"></span>
+                <span class="text-footer2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </ul>
+      <div id="loadMorePosts" class="btn btn-primary">Load more posts</div>
+    </div>
+  </main>
+  {{> footer}} {{> scriptResources}} {{> globalScripts}}
+
+  <div class="modal fade" id="voteLoginError">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You must be logged in to vote on a post.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <a href="/signin" class="btn btn-primary">Login</a>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="upvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only upvote a post once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="downvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only downvote a post once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <script>
+    $(document).ready(function () {
+
+      var skipNum = 0;
+
+      function addNoPosts() {
+        var noPosts = document.createElement("div");
+        noPosts.className = "comment-container";
+        var icon = document.createElement("i");
+        icon.className = "material-icons md-orange md-92 flex-fill";
+        icon.innerHTML = "sentiment_very_dissatisfied";
+        var content = document.createElement("div");
+        content.className = "mt-3 mb-3 d-flex flex-column align-contents-center justify-contents-center";
+        var text = document.createElement("h2");
+        text.className = "flex-fill text-center";
+        text.innerHTML = "No posts yet...";
+        var subtext = document.createElement("h6");
+        subtext.className = "mt-1 flex-fill text-center subheading";
+
+        var username = "{{uname}}";
+        if (username)
+          subtext.innerHTML = "This place feels empty, why not start a discussion?";
+        else
+          subtext.innerHTML = "Login or register to start a discussion now.";
+        content.append(icon);
+        content.append(text);
+        content.append(subtext);
+        noPosts.append(content);
+        noPosts.id = "noPosts";
+        $("#postContainer").append(noPosts);
+      }
+
+      $(document).ajaxSend(function (e, jqxhr, options) {
+        // if the request same with the above source/path
+        if (options.url == "post/upPost" || options.url == "post/downPost") {
+          // set global to false
+          options.global = false;
+          $("#loading-posts").css("display", "none");
+        }
+      });
+
+      $(document).ajaxStart(function () {
+        $("#loading-posts").css("display", "block");
+      });
+
+      $(document).ajaxComplete(function () {
+        $("#loading-posts").css("display", "none");
+      });
+
+      $.post("/post/search", { searchTerm: "{{searchTerm}}" }, (foundPosts) => {
+        $("#postContainer").empty();
+        if (foundPosts.length > 0) {
+          for (let i = 0; i < foundPosts.length; i++) {
+            addPost(foundPosts[i]._id, foundPosts[i].postTitle, foundPosts[i].postDescription, foundPosts[i].postAuthor, foundPosts[i].relativeTime, foundPosts[i].postScore, foundPosts[i].commentNumber, foundPosts[i].upvote, foundPosts[i].downvote);
+            skipNum += 1;
+          }
+        } else {
+          addNoPosts();
+        }
+      })
+
+      $("#loadMorePosts").click(() => {
+        $.post("/post/search/more", { searchTerm: "{{searchTerm}}", skipNum }, (foundPosts) => {
+          if (foundPosts.length > 0) {
+            for (let i = 0; i < foundPosts.length; i++) {
+              addPost(foundPosts[i]._id, foundPosts[i].postTitle, foundPosts[i].postDescription, foundPosts[i].postAuthor, foundPosts[i].relativeTime, foundPosts[i].postScore, foundPosts[i].commentNumber, foundPosts[i].upvote, foundPosts[i].downvote);
+              skipNum += 1;
+            }
+          }
+        })
+      })
+
+      $("#sortByDate").click(() => {
+        $("#postContainer").empty();
+        $.get("/post/search/date", { searchTerm: "{{searchTerm}}" }, (foundPosts) => {
+          skipNum = 0;
+          if (foundPosts.length > 0) {
+            for (let i = 0; i < foundPosts.length; i++) {
+              addPost(foundPosts[i]._id, foundPosts[i].postTitle, foundPosts[i].postDescription, foundPosts[i].postAuthor, foundPosts[i].relativeTime, foundPosts[i].postScore, foundPosts[i].commentNumber, foundPosts[i].upvote, foundPosts[i].downvote);
+              skipNum += 1;
+            }
+          } else {
+            addNoPosts();
+          }
+        })
+      })
+
+      $("#sortByPopularity").click(() => {
+        $("#postContainer").empty();
+        $.get("/post/search/score", { searchTerm: "{{searchTerm}}" }, (foundPosts) => {
+          skipNum = 0;
+          if (foundPosts.length > 0) {
+            for (let i = 0; i < foundPosts.length; i++) {
+              addPost(foundPosts[i]._id, foundPosts[i].postTitle, foundPosts[i].postDescription, foundPosts[i].postAuthor, foundPosts[i].relativeTime, foundPosts[i].postScore, foundPosts[i].commentNumber, foundPosts[i].upvote, foundPosts[i].downvote);
+              skipNum += 1;
+            }
+          } else {
+            addNoPosts();
+          }
+        })
+      })
+
+
+      function addPost(postID, postTitle, postDescription, postAuthor, postDate, postScore, commentNumber, upvote, downvote) {
+        var mediaPost = document.createElement("div");
+        mediaPost.className = "media post";
+        var flexRow = document.createElement("div");
+        flexRow.className = "d-flex flex-row";
+        var flexColumn = document.createElement("div");
+        flexColumn.className = "media-body d-flex flex-column";
+        var voteBox = document.createElement("div");
+        voteBox.className = "mr-3 actions flex-column";
+        var arrowUpward = document.createElement("i");
+        arrowUpward.className = "material-icons md-18 md-dark up";
+        arrowUpward.innerHTML = "arrow_upward";
+        arrowUpward.id = "arrow_upward" + postID;
+
+        var upwardSpan = document.createElement("span")
+        upwardSpan.addEventListener("click", function () {
+          console.log("upwardSpan clicked")
+
+          upvotePost(postID)
+
+        })
+        upwardSpan.append(arrowUpward);
+
+        var voteValue = document.createElement("span");
+        voteValue.className = "votes";
+        voteValue.id = "votes" + postID
+        voteValue.innerHTML = postScore;
+        var arrowDownward = document.createElement("i");
+        arrowDownward.className = "material-icons md-18 md-dark down";
+        arrowDownward.innerHTML = "arrow_downward";
+        arrowDownward.id = "arrow_downward" + postID
+        var downwardSpan = document.createElement("span")
+        downwardSpan.addEventListener("click", function () {
+          console.log("downwardSpan clicked")
+
+          downvotePost(postID)
+        })
+        downwardSpan.append(arrowDownward);
+
+
+        var commentIcon = document.createElement("i");
+        commentIcon.className = "material-icons md-16 md-dark";
+        commentIcon.innerHTML = "comment";
+        var personIcon = document.createElement("i");
+        personIcon.className = "material-icons md-18 md-dark";
+        personIcon.innerHTML = "person_outline";
+        var postTitleContainer = document.createElement("h5");
+        var postTitleLink = document.createElement("a");
+        postTitleLink.setAttribute("href", "post/" + postID);
+        postTitleContainer.className = "mt-0 mb-1";
+        postTitleLink.innerHTML = postTitle;
+        var postContent = document.createElement("div");
+        postContent.innerHTML = postDescription;
+        var postInfo = document.createElement("div");
+        postInfo.className = "p-1 flex-fill";
+        var spanInfo = document.createElement("span");
+        spanInfo.className = "info";
+        var spanComment = document.createElement("span");
+        spanComment.className = "mr-3";
+        var commentNumberContainer = document.createElement("a");
+        commentNumberContainer.innerHTML = " ";
+        commentNumberContainer.setAttribute("href", "/post/" + postID + "#comments");
+        var spanUsername = document.createElement("span");
+        spanUsername.className = "p-1";
+        var userName = document.createElement("a");
+        userName.innerHTML = postAuthor;
+        userName.setAttribute("href", "/user/" + postAuthor);
+
+        voteBox.append(upwardSpan);
+        voteBox.append(voteValue);
+        voteBox.append(downwardSpan);
+        flexRow.append(voteBox);
+        postTitleContainer.append(postTitleLink);
+        flexColumn.append(postTitleContainer);
+        flexColumn.append(postContent);
+        commentNumberContainer.append(commentIcon);
+        commentNumberContainer.append(" " + commentNumber + " comments");
+        spanComment.append(commentNumberContainer);
+        spanInfo.append(spanComment);
+        spanUsername.append(personIcon);
+        spanUsername.append("Posted by ");
+        spanUsername.append(userName);
+        spanUsername.append(" · " + postDate + " ago");
+        spanInfo.append(spanUsername);
+        postInfo.append(spanInfo);
+        flexColumn.append(postInfo);
+        flexRow.append(flexColumn);
+        mediaPost.append(flexRow);
+
+
+        var username = "{{uname}}";
+        for (let i = 0; i < upvote.length; i++) {
+          if (upvote[i] == username) { // make arrowup orange
+            arrowUpward.setAttribute("style", "color:#F36E21");
+          }
+        }
+
+        for (let i = 0; i < downvote.length; i++) {
+          if (downvote[i] == username) { // make arrowdown blue
+            arrowDownward.setAttribute("style", "color:#3C8AFF");
+          }
+        }
+
+        $("#postContainer").append(mediaPost);
+      }
+
+
+
+      function upvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/upPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+
+              $('#arrow_downward' + postID).css({ color: "lightgray" });
+              $('#arrow_upward' + postID).css({ color: "#F36E21" });
+              document.getElementById("votes" + postID).innerHTML = foundUser.postScore;
+            }
+            else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#upvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function downvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/downPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+              $('#arrow_upward' + postID).css({ color: "lightgray" });
+              $('#arrow_downward' + postID).css({ color: "#3C8AFF" });
+              document.getElementById("votes" + postID).innerHTML = foundUser.postScore;
+              //set to blue
+            } else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#downvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+      /*
+                function upvoteComment(commentID) {
+                  var username = "{{uname}}";
+      
+                  if (!username) {
+                    //add modal
+                  } else {
+                    $.post("upComment", {
+                      id: commentID,
+                      username: username
+                    }, (foundUser) => {
+                      if (foundUser) {
+                        //set to orange
+                      }
+                    })
+                  }
+                }
+      
+                function downvoteComment(commentID) {
+                  var username = "{{uname}}";
+      
+                  if (!username) {
+                    //add modal
+                  } else {
+                    $.post("downComment", {
+                      id: commentID,
+                      username: username
+                    }, (foundUser) => {
+                      if (foundUser) {
+                        //set to blue
+                      }
+                    })
+                  }
+                }
+      
+                */
+    }
+    );
+  </script>
+
+</body>
+
+</html>

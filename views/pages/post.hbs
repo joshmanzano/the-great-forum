@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{> headerResources}}
+  <title>The Forum</title>
+
+  <link href="./stylesheets/loading.css" rel="stylesheet">
+
+  <style>
+    #loading-comments {
+      display: none;
+    }
+  </style>
+
+  <script>
+
+
+
+    var username = "{{uname}}";
+    var newComments = 0;
+
+    function traverseNestedComments(comment) {
+      if (comment.nestedComments) {
+        for (let i = 0; i < comment.nestedComments.length; i++) {
+          $.get("/comment/" + comment.nestedComments[i], {}, (newComment) => {
+            var commentContainer = "div#" + comment._id
+            addNestedComment(commentContainer, newComment._id, newComment._postID, newComment.commentContent, newComment.commentAuthor, newComment.relativeTime, newComment.commentScore, newComment.upvote, newComment.downvote);
+            traverseNestedComments(newComment);
+          })
+        }
+      }
+    }
+
+    function loadComments() {
+      $("#allComments").empty();
+      $.post("/post/comments", { id: "{{postID}}" }, (comments) => {
+        if (comments.length > 0) {
+          for (let i = 0; i < comments.length; i++) {
+            addComment(comments[i]._id, comments[i]._postID, comments[i].commentContent, comments[i].commentAuthor, comments[i].relativeTime, comments[i].commentScore, comments[i].upvote, comments[i].downvote);
+            traverseNestedComments(comments[i])
+          }
+        } else {
+          var noComments = document.createElement("div");
+          noComments.className = "comment-container";
+          var icon = document.createElement("i");
+          icon.className = "material-icons md-orange md-92 flex-fill";
+          icon.innerHTML = "sentiment_very_dissatisfied";
+          var content = document.createElement("div");
+          content.className = "mt-3 mb-3 d-flex flex-column align-contents-center justify-contents-center";
+          var text = document.createElement("h2");
+          text.className = "flex-fill text-center";
+          text.innerHTML = "No comments yet...";
+          var subtext = document.createElement("h6");
+          subtext.className = "mt-1 flex-fill text-center subheading";
+
+          var username = "{{uname}}";
+          if (username)
+            subtext.innerHTML = "This place feels empty, why not start a discussion?";
+          else
+            subtext.innerHTML = "Login or register to start a discussion now.";
+          content.append(icon);
+          content.append(text);
+          content.append(subtext);
+          noComments.append(content);
+          noComments.id = "noComment";
+          $("#allComments").append(noComments);
+        }
+      })
+    }
+
+    function addComment(commentID, postID, commentContent, commentAuthor, commentDate, commentScore, upvote, downvote) {
+      var wholeCommentContainer = document.createElement("div");
+      wholeCommentContainer.className = "comment-container";
+      var mainCommentContainer = document.createElement("div");
+      mainCommentContainer.className = "media comment ml-3";
+      var voteContainer = document.createElement("div");
+      voteContainer.className = "mr-3 commentactions";
+      var upArrow = document.createElement("i");
+      upArrow.className = "material-icons md-18 md-dark up";
+      upArrow.innerHTML = "arrow_upward";
+      upArrow.id = "arrow_upward" + commentID;
+      var upwardSpan = document.createElement("span")
+      upwardSpan.addEventListener("click", function () {
+        console.log("upwardSpan clicked")
+
+        upvoteComment(commentID, postID);
+
+      })
+      upwardSpan.append(upArrow);
+      /*
+      var voteValue = document.createElement("span");
+      voteValue.className = "votes";
+      voteValue.id = "votes" + commentID
+      voteValue.innerHTML = commentScore;
+      */
+      var downArrow = document.createElement("i");
+      downArrow.className = "material-icons md-18 md-dark down";
+      downArrow.innerHTML = "arrow_downward";
+
+      downArrow.id = "arrow_downward" + commentID
+      var downwardSpan = document.createElement("span")
+      downwardSpan.addEventListener("click", function () {
+        console.log("downwardSpan clicked")
+
+        downvoteComment(commentID, postID)
+      })
+      downwardSpan.append(downArrow);
+
+      var commentBodyContainer = document.createElement("div");
+      commentBodyContainer.className = "media-body";
+      commentBodyContainer.id = commentID;
+      var flexContainer = document.createElement("div");
+      flexContainer.className = "d-flex";
+      var userNameContainer = document.createElement("h6");
+      userNameContainer.className = "mt-0";
+      var userName = document.createElement("a");
+      userName.setAttribute("href", "/user/" + commentAuthor);
+      userName.setAttribute("style", "color : #000000;");
+      userName.innerHTML = commentAuthor;
+      var commentScoreContainer = document.createElement("span");
+      commentScoreContainer.className = "ml-2 points";
+      commentScoreContainer.innerHTML = commentScore + " points";
+      commentScoreContainer.id = "votes" + commentID;
+      var separator = document.createElement("span");
+      separator.className = "ml-2";
+      separator.innerHTML = "·";
+      var commentDateContainer = document.createElement("span");
+      commentDateContainer.className = "ml-2 points";
+      commentDateContainer.innerHTML = commentDate;
+      var commentContentContainer = document.createElement("div");
+      commentContentContainer.innerHTML = commentContent;
+      var navContainer = document.createElement("div");
+      navContainer.className = "mt-2";
+      var infoSpan = document.createElement("span");
+      infoSpan.className = "info";
+      var replyLink = document.createElement("a");
+      replyLink.setAttribute("href", "javascript:void(0)");
+      replyLink.addEventListener("click", function () {
+
+        var addCommentContainer = document.createElement("div")
+
+        var txtComment = document.createElement("textarea")
+        //txtComment.setAttribute("oninput", "checkCommentBox();")
+        txtComment.className = "form-control mt-2"
+        txtComment.type = "text"
+        txtComment.placeholder = "Type a comment"
+
+        var btnSubmit = document.createElement("button")
+        //btnSubmit.disabled = true
+        //btnSubmit.setAttribute("onclick", "createNewNestedComment()")
+        btnSubmit.className = "btn btn-primary mt-2"
+        btnSubmit.innerHTML = "Submit"
+        btnSubmit.addEventListener("click", function () {
+          $("#allComments").empty();
+          $.post("/comment/nested", { postID: "{{postID}}", commentID, commentContent: txtComment.value }, (newComment) => {
+            loadComments();
+          })
+        })
+
+        var txtCommentContainer = document.createElement("div")
+        txtCommentContainer.className = "container-fluid"
+
+        txtCommentContainer.append(txtComment)
+        txtCommentContainer.append(btnSubmit)
+
+        addCommentContainer.append(txtCommentContainer)
+
+        $(txtCommentContainer).appendTo(txtContainer).hide().slideDown(500)
+
+      }, {
+          once: true
+        })
+
+      var commentIcon = document.createElement("i");
+      commentIcon.className = "material-icons md-16 md-dark";
+      commentIcon.innerHTML = "comment";
+      var replyText = document.createElement("span");
+      replyText.innerHTML = "Reply";
+
+      var txtContainer = document.createElement("div")
+
+      voteContainer.append(upwardSpan);
+      //voteContainer.append(voteValue);
+      voteContainer.append(downwardSpan);
+      userNameContainer.append(userName);
+      flexContainer.append(userNameContainer);
+      flexContainer.append(commentScoreContainer);
+      flexContainer.append(separator);
+      flexContainer.append(commentDateContainer);
+      if (username) {
+        replyLink.append(commentIcon);
+        replyLink.append(replyText);
+        infoSpan.append(replyLink);
+        navContainer.append(infoSpan);
+      }
+      commentBodyContainer.append(flexContainer);
+      commentBodyContainer.append(commentContentContainer);
+      commentBodyContainer.append(navContainer);
+      commentBodyContainer.append(txtContainer)
+      mainCommentContainer.append(voteContainer);
+      mainCommentContainer.append(commentBodyContainer);
+      wholeCommentContainer.append(mainCommentContainer);
+
+
+      for (let i = 0; i < upvote.length; i++) {
+        if (upvote[i] == username) { // make arrowup orange
+          upArrow.setAttribute("style", "color:#F36E21");
+        }
+      }
+
+      for (let i = 0; i < downvote.length; i++) {
+        if (downvote[i] == username) { // make arrowdown blue
+          downArrow.setAttribute("style", "color:#3C8AFF");
+        }
+      }
+
+      $("#allComments").append(wholeCommentContainer);
+    }
+
+    function addNestedComment(commentContainer, commentID, postID, commentContent, commentAuthor, commentDate, commentScore, upvote, downvote) {
+      var mainCommentContainer = document.createElement("div");
+      mainCommentContainer.className = "media comment";
+      mainCommentContainer.setAttribute("style", "margin-top: 20px");
+      var voteContainer = document.createElement("div");
+      voteContainer.className = "mr-3 commentactions";
+      var upArrow = document.createElement("i");
+      upArrow.className = "material-icons md-18 md-dark up";
+      upArrow.innerHTML = "arrow_upward";
+      upArrow.id = "arrow_upward" + commentID;
+      var upwardSpan = document.createElement("span")
+      upwardSpan.addEventListener("click", function () {
+        console.log("nested - upwardSpan clicked")
+
+        upvoteComment(commentID, postID);
+
+      })
+      upwardSpan.append(upArrow);
+      var downArrow = document.createElement("i");
+      downArrow.className = "material-icons md-18 md-dark down";
+      downArrow.innerHTML = "arrow_downward";
+      downArrow.id = "arrow_downward" + commentID
+      var downwardSpan = document.createElement("span")
+      downwardSpan.addEventListener("click", function () {
+        console.log("downwardSpan clicked")
+
+        downvoteComment(commentID, postID)
+      })
+      downwardSpan.append(downArrow);
+      var commentBodyContainer = document.createElement("div");
+      commentBodyContainer.className = "media-body";
+      commentBodyContainer.id = commentID;
+      var flexContainer = document.createElement("div");
+      flexContainer.className = "d-flex";
+      var userNameContainer = document.createElement("h6");
+      userNameContainer.className = "mt-0";
+      var userName = document.createElement("a");
+      userName.setAttribute("href", "user-profile?u=" + commentAuthor);
+      userName.setAttribute("style", "color : #000000;");
+      userName.innerHTML = commentAuthor;
+      var commentScoreContainer = document.createElement("span");
+      commentScoreContainer.className = "ml-2 points";
+      commentScoreContainer.innerHTML = commentScore + " points";
+      var separator = document.createElement("span");
+      separator.className = "ml-2";
+      separator.innerHTML = "·";
+      var commentDateContainer = document.createElement("span");
+      commentDateContainer.className = "ml-2 points";
+      commentDateContainer.innerHTML = commentDate;
+      var commentContentContainer = document.createElement("div");
+      commentContentContainer.innerHTML = commentContent;
+      var navContainer = document.createElement("div");
+      navContainer.className = "nav-item active mt-2";
+      var infoSpan = document.createElement("span");
+      infoSpan.className = "info";
+      var replyLink = document.createElement("a");
+      replyLink.setAttribute("href", "javascript:void(0)");
+      replyLink.addEventListener("click", function (e) {
+        var id = $(this).attr("data-id")
+
+        var addCommentContainer = document.createElement("div")
+
+        var txtComment = document.createElement("textarea")
+        //txtComment.setAttribute("oninput", "checkCommentBox();")
+        txtComment.className = "form-control mt-2"
+        txtComment.type = "text"
+        txtComment.placeholder = "Type a comment"
+
+        var btnSubmit = document.createElement("button")
+        //btnSubmit.disabled = true
+        //btnSubmit.setAttribute("onclick", "createNewComment()")
+        btnSubmit.className = "btn btn-primary mt-2"
+        btnSubmit.innerHTML = "Submit"
+        btnSubmit.addEventListener("click", function () {
+          $("#allComments").empty();
+          $.post("/comment/nested", { postID: "{{postID}}", commentID, commentContent: txtComment.value }, (newComment) => {
+            loadComments();
+          })
+        })
+
+        var txtCommentContainer = document.createElement("div")
+        txtCommentContainer.className = "container-fluid"
+
+        txtCommentContainer.append(txtComment)
+        txtCommentContainer.append(btnSubmit)
+
+        addCommentContainer.append(txtCommentContainer)
+
+        $(txtCommentContainer).appendTo(txtContainer).hide().slideDown(500)
+      }, {
+          once: true
+        })
+
+      var commentIcon = document.createElement("i");
+      commentIcon.className = "material-icons md-16 md-dark";
+      commentIcon.innerHTML = "comment";
+      var replyText = document.createElement("span");
+      replyText.innerHTML = " Reply";
+
+      var txtContainer = document.createElement("div")
+
+      voteContainer.append(upwardSpan);
+      voteContainer.append(downwardSpan);
+      userNameContainer.append(userName);
+      flexContainer.append(userNameContainer);
+      flexContainer.append(commentScoreContainer);
+      flexContainer.append(separator);
+      flexContainer.append(commentDateContainer);
+      if (username) {
+        replyLink.append(commentIcon);
+        replyLink.append(replyText);
+        infoSpan.append(replyLink);
+        navContainer.append(infoSpan);
+      }
+      commentBodyContainer.append(flexContainer);
+      commentBodyContainer.append(commentContentContainer);
+      commentBodyContainer.append(navContainer);
+      commentBodyContainer.append(txtContainer)
+      mainCommentContainer.append(voteContainer);
+      mainCommentContainer.append(commentBodyContainer);
+
+      for (let i = 0; i < upvote.length; i++) {
+        if (upvote[i] == username) { // make arrowup orange
+          upArrow.setAttribute("style", "color:#F36E21");
+        }
+      }
+
+      for (let i = 0; i < downvote.length; i++) {
+        if (downvote[i] == username) { // make arrowdown blue
+          downArrow.setAttribute("style", "color:#3C8AFF");
+        }
+      }
+
+      for (let i = 0; i < upvote.length; i++) {
+        if (upvote[i] == username) { // make arrowup orange
+          upArrow.setAttribute("style", "color:#F36E21");
+        }
+      }
+
+      for (let i = 0; i < downvote.length; i++) {
+        if (downvote[i] == username) { // make arrowdown blue
+          downArrow.setAttribute("style", "color:#3C8AFF");
+        }
+      }
+
+      $(commentContainer).append(mainCommentContainer);
+    }
+
+    function upvoteComment(commentID, postID) {
+      var username = "{{uname}}";
+
+      if (!username) {
+        $("#voteLoginError").modal("show");
+      } else {
+        $.post("comment/upComment", {
+          commentID: commentID,
+          postID: postID,
+          username: username
+        }, (foundUser) => {
+          if (foundUser) {
+
+            $('#arrow_downward' + commentID).css({ color: "lightgray" });
+            $('#arrow_upward' + commentID).css({ color: "#F36E21" });
+
+            for (let i = 0; i < foundUser.comment.length; i++) {
+              if (foundUser.comment[i]._id == commentID) {
+                document.getElementById("votes" + commentID).innerHTML = foundUser.comment[i].commentScore + " points";
+              }
+            }
+          }
+          else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+            $("#upvoteOnce").modal("show");
+          }
+        })
+      }
+    }
+
+    function downvoteComment(commentID, postID) {
+      var username = "{{uname}}";
+
+      if (!username) {
+        $("#voteLoginError").modal("show");
+      } else {
+        $.post("comment/downComment", {
+          commentID: commentID,
+          postID: postID,
+          username: username
+        }, (foundUser) => {
+          if (foundUser) {
+            $('#arrow_upward' + commentID).css({ color: "lightgray" });
+            $('#arrow_downward' + commentID).css({ color: "#3C8AFF" });
+
+            for (let i = 0; i < foundUser.comment.length; i++) {
+              if (foundUser.comment[i]._id == commentID) {
+                document.getElementById("votes" + commentID).innerHTML = foundUser.comment[i].commentScore + " points";
+              }
+            }
+            //set to blue
+          } else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+
+            $("#downvoteOnce").modal("show");
+          }
+        })
+      }
+    }
+
+    function createNewComment() {
+      $("#noComment").remove();
+      var commentContent = $("#commentContent").val();
+      $("#commentContent").val("");
+      $("#submitButton").attr("disabled", "disabled");
+      $.post("/comment/create", { postID: "{{postID}}", commentContent }, (newComment) => {
+        //addComment(newComment._id, newComment._postID, newComment.commentContent, newComment.commentAuthor, newComment.relativeTime, newComment.commentScore);
+        loadComments();
+        newComments += 1;
+        $("#commentNumber").html({{ commentNumber }}+newComments + " comments");
+    })
+		}
+
+    function checkCommentBox() {
+      if ($("#commentContent").val().trim() != "") {
+        $("#submitButton").removeAttr("disabled");
+      } else {
+        $("#submitButton").attr("disabled", "disabled");
+      }
+    }
+  </script>
+
+</head>
+
+<body>
+  {{#if uname}} {{> signedNavBar}} {{else}} {{> unsignedNavBar}} {{/if}}
+  <main role="main" class="container">
+    <div class="starter-template">
+      <!-- START OF POST SECTION -->
+      <div class="media post">
+        <div class="mr-3 actions">
+          <i id="upwardSpanpost" data-id="{{postID}}" class="material-icons md-18 md-dark up">arrow_upward</i>
+          <span id="votes" class="votes">{{postScore}}</span>
+          <i id="downwardSpanpost" data-id="{{postID}}" class="material-icons md-18 md-dark down">arrow_downward</i>
+        </div>
+        <div class="media-body">
+          <h5 class="mt-0 mb-1">{{{postTitle}}}</h5>
+          <div style="max-height: none;">{{{postDescription}}}</div>
+          <div class="mt-2 flex-fill">
+            <span class="info">
+              <span class="p-2">
+                <i class="material-icons md-16 md-dark">comment</i>
+                <a id="commentNumber" href="#comments">{{commentNumber}} comments</a>
+              </span>
+              <span class="p-2">
+                <i class="material-icons md-18 md-dark">person_outline</i> Posted by
+                <a href="/user/{{postAuthor}}">{{postAuthor}}</a> · {{postDate}} ago
+              </span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="postcomment">
+        {{#if uname}}
+        <h5 class="mt-0 mb-1 ml-2">Replying as
+          <a href="/user/{{uname}}">{{uname}}</a>
+        </h5>
+        <div class="container-fluid mb-2 mt-3">
+          <textarea oninput="checkCommentBox();" id="commentContent" class="form-control mt-3" type="text" placeholder="Type a comment"></textarea>
+          <button disabled id="submitButton" onclick="createNewComment();" class="btn btn-primary mt-2">Submit</button>
+        </div>
+        {{else}}
+        <h5 class="mt-0 mb-1 ml-2">Reply to post</h5>
+        <div class="container-fluid mb-2 mt-2">
+          <form>
+            <fieldset disabled>
+              <input type="text" class="form-control mb-3" placeholder="What are your thoughts? Login or Register">
+            </fieldset>
+          </form>
+        </div>
+        {{/if}}
+        <a name="comments"></a>
+
+        <div id="allComments"></div>
+
+        <div id="loading-comments">
+          <div class="comment-container">
+            <div class="ml-3 media comment">
+              <div class="mr-3 commentactions">
+                <i class="material-icons md-18 md-dark">arrow_upward</i>
+                <i class="material-icons md-18 md-dark">arrow_downward</i>
+              </div>
+              <div class="d-flex media-body">
+                <div class="text">
+                  <div>
+                    <span class="text-footer3"></span>
+                    <span class="text-footer1"></span>
+                  </div>
+                  <div class="text-line"></div>
+                  <div class="text-line"></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-container">
+            <div class="ml-3 media comment">
+              <div class="mr-3 commentactions">
+                <i class="material-icons md-18 md-dark">arrow_upward</i>
+                <i class="material-icons md-18 md-dark">arrow_downward</i>
+              </div>
+              <div class="d-flex media-body">
+                <div class="text">
+                  <div>
+                    <span class="text-footer3"></span>
+                    <span class="text-footer1"></span>
+                  </div>
+                  <div class="text-line"></div>
+                  <div class="text-line"></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-container">
+            <div class="ml-3 media comment">
+              <div class="mr-3 commentactions">
+                <i class="material-icons md-18 md-dark">arrow_upward</i>
+                <i class="material-icons md-18 md-dark">arrow_downward</i>
+              </div>
+              <div class="d-flex media-body">
+                <div class="text">
+                  <div>
+                    <span class="text-footer3"></span>
+                    <span class="text-footer1"></span>
+                  </div>
+                  <div class="text-line"></div>
+                  <div class="text-line"></div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+    </div>
+  </main>
+
+  <div class="modal fade" id="voteLoginError">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You must be logged in to vote.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <a href="/signin" class="btn btn-primary">Login</a>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="upvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only upvote a post or comment once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="downvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only downvote a post or comment once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  {{> scriptResources}} {{> footer}}
+
+  <script>
+    $(document).ready(function () {
+      $(document).ajaxSend(function (e, jqxhr, options) {
+        // if the request same with the above source/path
+        if (options.url == "comment/upComment" || options.url == "comment/downComment" ||
+          options.url == "post/upVote" || options.url == "post/downVote") {
+          // set global to false
+          options.global = false;
+          $("#loading-comments").css("display", "none");
+        }
+      });
+
+      $(document).ajaxStart(function () {
+        $("#loading-comments").css("display", "block");
+      });
+      $(document).ajaxComplete(function () {
+        $("#loading-comments").css("display", "none");
+      });
+
+      /*
+            $("body").click(function (e) {
+              if (($(e.target).hasClass("testing")) || $(e.target).parents(".testing").length) {
+                var id = e.currentTarget.getAttribute('id')
+      
+                console.log("Reply clicked, id=" + id);
+              }
+            });
+      */
+
+      $("#upwardSpanpost").on("click", function () {
+        var postID = $("#upwardSpanpost").attr("data-id")
+        upvotePost(postID)
+      });
+
+      $("#downwardSpanpost").on("click", function () {
+        var postID = $("#downwardSpanpost").attr("data-id")
+        downvotePost(postID)
+      });
+
+
+
+      function upvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/upPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+
+              $('#downwardSpanpost').css({ color: "lightgray" });
+              $('#upwardSpanpost').css({ color: "#F36E21" });
+              document.getElementById("votes").innerHTML = foundUser.postScore;
+            }
+            else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#upvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function downvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/downPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+              $('#upwardSpanpost').css({ color: "lightgray" });
+              $('#downwardSpanpost').css({ color: "#3C8AFF" });
+              document.getElementById("votes").innerHTML = foundUser.postScore;
+              //set to blue
+            } else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#downvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      loadComments();
+
+    });
+
+
+  </script> {{> globalScripts}}
+
+</body>
+
+</html>

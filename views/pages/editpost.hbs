@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{> headerResources}}
+    <title>The Forum</title>
+
+    <script>
+  //      function editPost(){
+  //          $.post("post/edit", {postID: "{{postID}}", postTitle: $("inputPostTitle").val(), postContent: $("inputPostContent").val()}, (editedPostLink) => {
+   //        })
+     //   }
+    </script>
+</head>
+
+<body>
+    {{> signedNavBar}}
+    <main role="main" class="container">
+        <div class="row" style="padding-top: 3rem;">
+            <div class="col-lg-4">
+                <div class="card mb-3 mt-5">
+                    <div class="card-header">
+                        Posting rules
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1. Remember the Golden Rule</li>
+                        <li class="list-group-item">2. Behave like you would in real life</li>
+                        <li class="list-group-item">3. Look for the original source of content</li>
+                        <li class="list-group-item">4. Search for duplicates before posting</li>
+                        <li class="list-group-item">5. Be nice!</li>
+                    </ul>
+                </div>
+                <small class="ml-2">
+                    <i>Slightly modified from
+                        <a href="https://www.reddit.com/submit">reddit</a>'s posting rules.
+                    </i>
+                </small>
+            </div>
+
+            <div class="col-lg-8">
+                <form>
+                    <div class="ml-3 h2 mb-3">Edit post</div>
+                    <div class="container-fluid">
+                        <input type="text" class="form-control" id="inputPostTitle" name = "postTitle" value="{{postTitle}}" required>
+                        <textarea class="form-control mt-3" type="text" id="inputPostContent" name = "postContent" rows="9">{{postContent}}</textarea>
+                    </div>
+                    <a class="btn btn-primary mt-2 ml-3" id = "savebtn">Save</a>
+                </form>
+            </div>
+        </div>
+    </main>
+    {{> footer}} {{> scriptResources}}
+
+    <script>
+        $(document).ready(function () {
+
+            $("#savebtn").on("click", function(evt){
+                var name = "{{uname}}"
+                $.post("post/edit",{
+                    uname: "{{uname}}",
+                    postID: "{{postID}}",
+                    postTitle: $("#inputPostTitle").val(),
+                    postContent: $("#inputPostContent").val()
+                },
+                (editedPostLink) => {
+                    window.location.href = "user/"+name;
+                });
+            }); 
+        });
+    </script>
+
+</body>
+
+</html>

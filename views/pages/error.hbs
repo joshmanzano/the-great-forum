@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{> headerResources}}
+    <title>The Forum</title>
+</head>
+
+<body>
+    {{#if uname}} {{> signedNavBar}} {{else}} {{> unsignedNavBar}} {{/if}}
+    <main role="main" class="container">
+        <div class="starter-template ">
+            <ul class="list-group">
+                <li class="list-group-item d-flex flex-column align-content-center">
+                    <i class="material-icons md-92 md-red mt-3">error_outline</i>
+                    <h1 class="text-center">Page not found</h1>
+                    <h6 class="text-center mt-1 mb-4 subheading">The page you requested does not exist</h6>
+                </li>
+            </ul>
+        </div>
+    </main>
+    {{> footer}}
+
+</body>
+
+</html>

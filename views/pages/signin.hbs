@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    {{> headerResources}}
+    <link href="./stylesheets/signin.css" rel="stylesheet">
+    <title>The Forum</title>
+</head>
+
+<body class="text-center">
+    <form class="form-signin" method="post">
+        <img class="mb-4 rounded-circle" src="https://scontent.fmnl4-2.fna.fbcdn.net/v/t1.0-9/35558047_2339044482777767_8428509173892775936_n.jpg?_nc_cat=0&oh=a3503251e265c5abc115c7995cbfccf6&oe=5BDED365"
+            width="72" height="72">
+        <div class="h4 mb-3 font-weight-normal">Sign in to your account</div>
+        <div class="form-group">
+            <label for="inputUsername">Username</label>
+            <input id="username-signin" name="username" type="text" class="form-control" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input id="password-signin" name="password" type="password" id="inputPassword" class="form-control" required>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+                <input id="remember-signin" name="rememberMe" type="checkbox" value="remember-me">Remember me</label>
+        </div>
+        <button id="signinbtn" class="nav-link btn btn-lg btn-primary btn-block">Sign in</button>
+        <div class="mt-3 text-center">Don't have an account?
+            <a href="/register">Register now</a>
+        </div>
+    </form>
+    {{!-- MODAL --}}
+    <div class="modal fade" id="errorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Login error</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+                </div>
+                <div class="modal-body">
+                    <p class="text-left">You entered an invalid username or password. Please try again.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Retry</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+
+    {{> scriptResources}}
+
+    <script>
+        $(document).ready(function () {
+
+            $("#signinbtn").on("click", function (evt) {
+                evt.preventDefault();
+                var username = $("#username-signin").val();
+                var password = $("#password-signin").val();
+                if ($("#remember-signin").is(":checked")) {
+                    var rememberMe = $("#remember-signin").val();
+                }
+                $.post("user/login", { uname: username, pword: password, rememberMe }, (checkUser) => {
+
+                    console.log("checkUser is " + checkUser);
+                    if (checkUser) {
+                        console.log('in if checkUser');
+                        window.location.replace("/");
+                    } else {
+                        $("#errorModal").modal("show");
+                    }
+
+
+                })
+            });
+
+
+
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,37 @@
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top justify-content-center">
+  <span class="d-flex w-50 mr-auto">
+    <a href="/"><img src="./Logo.png" width="32px" height="32px" class="mr-2 mt-1"></a>
+    <a class="navbar-brand" href="/">The Forum</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault"
+      aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </span>
+
+  <div class="navbar-collapse collapse w-100">
+    <form action="/post/search" method="get" class="navbar-nav w-100 justify-content-center my-2 my-lg-0">
+      <input class="form-control mr-sm-2" id="inputSearch" name="searchTerm" type="text" placeholder="Search posts..." aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" id="searchbtn" type="submit" onMouseOver="this.style.cursor='pointer'">
+        <i class="material-icons md-18">search</i>
+      </button>
+    </form>
+
+    <div class="nav navbar-nav ml-auto w-100 justify-content-end">
+      <a href="/post/create" class="btn btn-success" onMouseOver="this.style.cursor='pointer'">
+        <i class="material-icons md-18">add</i> Create post</a>
+      <div class="dropdown mr-2 ml-2">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
+          aria-expanded="false">
+          {{!-- <img class="avatar img-thumbnail" src="/user/avatar/{{avatar}}"> --}} {{uname}}
+        </button>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+          <a href="/user" style="color: #000;" class="dropdown-item" onMouseOver="this.style.cursor='pointer'">View Profile
+          </a>
+          <form action="logout" class="form-inline my-2 my-lg-0" method="post">
+            <button type="submit" class="dropdown-item" onMouseOver="this.style.cursor='pointer'">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

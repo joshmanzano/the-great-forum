@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  {{> headerResources}}
+  <title>The Forum</title>
+  <style type="text/css">
+    .comment-container {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  {{#if uname}} {{> signedNavBar}} {{else}} {{> unsignedNavBar}} {{/if}}
+  <main role="main" class="container">
+    <div class="row starter-template">
+      <div class="col-lg-3">
+        <div class="text-center mb-3 mt-5">
+          {{#if avatar}}
+            <img class="avatar img-thumbnail" src="/user/avatar/{{avatar}}">
+          {{else}}
+            <img class="avatar img-thumbnail" src="/user/avatar/default">
+          {{/if}}
+        </div>
+        <div class="ml-4">
+          <div class="font-weight-bold">@{{username}}</div>
+          <div class="description">{{{shortBio}}}</div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="editCommentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="editCommentLabel">Edit comment</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <textarea class="form-control mt-3" type="text" id="inputCommentContent" rows="3"> </textarea>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" id="savechanges" class="btn btn-primary" data-dismiss="modal">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="deleteCommentConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteCommentLabel">Delete comment</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete this comment?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" id="deleteCommentModal" class="btn btn-danger" data-dismiss="modal">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="deletePostConfirmation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deletePostLabel">Delete post</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete this post?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" data-dismiss="modal" id="btnDeletePost">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-9">
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active h3" id="user-posts-tab" data-toggle="pill" href="#user-posts" role="tab" aria-controls="user-posts"
+              aria-selected="true">Posts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link h3" id="user-comments-tab" data-toggle="pill" href="#user-comments" role="tab" aria-controls="user-comments"
+              aria-selected="false">Comments</a>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+          <div class="tab-pane fade show active" id="user-posts" role="tabpanel" aria-labelledby="user-posts-tab">
+            <ul id="postContainer" class="list-unstyled">
+              <div id="loading-posts">
+                <div class="d-flex flex-row mb-3 media post">
+                  <div class="mr-3 actions">
+                    <i class="material-icons md-18 md-dark">arrow_upward</i>
+                    <span class="votes1"></span>
+                    <i class="material-icons md-18 md-dark">arrow_downward</i>
+                  </div>
+                  <div class="d-flex flex-column ml-1">
+                    <div class="text">
+                      <div class="title"></div>
+                      <div class="text-line"></div>
+                      <div class="text-line"></div>
+                      <div>
+                        <span class="text-footer1"></span>
+                        <span class="text-footer2"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-row mb-3 media post">
+                  <div class="mr-3 actions">
+                    <i class="material-icons md-18 md-dark">arrow_upward</i>
+                    <span class="votes1"></span>
+                    <i class="material-icons md-18 md-dark">arrow_downward</i>
+                  </div>
+                  <div class="d-flex flex-column ml-1">
+                    <div class="text">
+                      <div class="title"></div>
+                      <div class="text-line"></div>
+                      <div class="text-line"></div>
+                      <div>
+                        <span class="text-footer1"></span>
+                        <span class="text-footer2"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-row mb-3 media post">
+                  <div class="mr-3 actions">
+                    <i class="material-icons md-18 md-dark">arrow_upward</i>
+                    <span class="votes1"></span>
+                    <i class="material-icons md-18 md-dark">arrow_downward</i>
+                  </div>
+                  <div class="d-flex flex-column ml-1">
+                    <div class="text">
+                      <div class="title"></div>
+                      <div class="text-line"></div>
+                      <div class="text-line"></div>
+                      <div>
+                        <span class="text-footer1"></span>
+                        <span class="text-footer2"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-row mb-3 media post">
+                  <div class="mr-3 actions">
+                    <i class="material-icons md-18 md-dark">arrow_upward</i>
+                    <span class="votes1"></span>
+                    <i class="material-icons md-18 md-dark">arrow_downward</i>
+                  </div>
+                  <div class="d-flex flex-column ml-1">
+                    <div class="text">
+                      <div class="title"></div>
+                      <div class="text-line"></div>
+                      <div class="text-line"></div>
+                      <div>
+                        <span class="text-footer1"></span>
+                        <span class="text-footer2"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex flex-row mb-3 media post">
+                  <div class="mr-3 actions">
+                    <i class="material-icons md-18 md-dark">arrow_upward</i>
+                    <span class="votes1"></span>
+                    <i class="material-icons md-18 md-dark">arrow_downward</i>
+                  </div>
+                  <div class="d-flex flex-column ml-1">
+                    <div class="text">
+                      <div class="title"></div>
+                      <div class="text-line"></div>
+                      <div class="text-line"></div>
+                      <div>
+                        <span class="text-footer1"></span>
+                        <span class="text-footer2"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </ul>
+
+
+            <div id="loadMorePosts" class="btn btn-outline-primary" style="display: none;">See more posts</div>
+          </div>
+
+          <div class="tab-pane fade" id="user-comments" role="tabpanel" aria-labelledby="user-comments-tab">
+            <ul id="commentContainer" class="list-unstyled">
+
+              <div id="loading-comments">
+                <div class="comment-container">
+                  <div class="ml-3 media comment">
+                    <div class="mr-3 commentactions">
+                      <i class="material-icons md-18 md-dark">arrow_upward</i>
+                      <i class="material-icons md-18 md-dark">arrow_downward</i>
+                    </div>
+                    <div class="d-flex media-body">
+                      <div class="text">
+                        <div>
+                          <span class="text-footer3"></span>
+                          <span class="text-footer1"></span>
+                        </div>
+                        <div class="text-line"></div>
+                        <div class="text-line"></div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="comment-container">
+                  <div class="ml-3 media comment">
+                    <div class="mr-3 commentactions">
+                      <i class="material-icons md-18 md-dark">arrow_upward</i>
+                      <i class="material-icons md-18 md-dark">arrow_downward</i>
+                    </div>
+                    <div class="d-flex media-body">
+                      <div class="text">
+                        <div>
+                          <span class="text-footer3"></span>
+                          <span class="text-footer1"></span>
+                        </div>
+                        <div class="text-line"></div>
+                        <div class="text-line"></div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="comment-container">
+                  <div class="ml-3 media comment">
+                    <div class="mr-3 commentactions">
+                      <i class="material-icons md-18 md-dark">arrow_upward</i>
+                      <i class="material-icons md-18 md-dark">arrow_downward</i>
+                    </div>
+                    <div class="d-flex media-body">
+                      <div class="text">
+                        <div>
+                          <span class="text-footer3"></span>
+                          <span class="text-footer1"></span>
+                        </div>
+                        <div class="text-line"></div>
+                        <div class="text-line"></div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </ul>
+
+            <div id="loadMoreComments" class="btn btn-outline-primary">See more comments</div>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal fade" id="voteLoginError">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You must be logged in to vote.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <a href="/signin" class="btn btn-primary">Login</a>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="upvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only upvote a post or comment once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="downvoteOnce">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Vote error</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+
+        </div>
+        <div class="modal-body">
+          <p class="text-left">You can only downvote a post or comment once.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Got it</button>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  {{> footer}} {{> scriptResources}}
+
+  <script>
+
+
+    $(document).ready(function () {
+      $(document).ajaxSend(function (e, jqxhr, options) {
+        // if the request same with the above source/path
+        if (options.url == "post/upPost" || options.url == "post/downPost") {
+          // set global to false
+          options.global = false;
+          $("#loading-posts").css("display", "none");
+        }
+      });
+
+
+      $(document).ajaxStart(function () {
+        $("#loading-posts").css("display", "block");
+        $("#loading-comments").css("display", "block");
+      });
+
+      $(document).ajaxComplete(function () {
+        $("#loading-posts").css("display", "none");
+        $("#loading-comments").css("display", "none");
+      });
+
+      var username = "{{username}}";
+
+      function loadPosts() {
+        $("#postContainer").empty();
+        $.post("/user/posts", {
+          username: username
+        }, (foundPosts) => {
+          if (foundPosts.length > 0) {
+            for (let i = 0; i < foundPosts.length; i++) {
+              addPost(foundPosts[i]._id, foundPosts[i].postTitle, foundPosts[i].postDescription, foundPosts[i].postAuthor, foundPosts[i].relativeTime, foundPosts[i].postScore, foundPosts[i].commentNumber, foundPosts[i].upvote, foundPosts[i].downvote);
+            }
+            $("#loadMorePosts").show()
+          } else {
+            addNoPosts()
+          }
+        })
+      }
+
+      function loadComments() {
+        $("#commentContainer").empty();
+        $.post("/user/comments", {
+          username: username
+        }, (foundComments) => {
+          if (foundComments.length > 0) {
+            for (let i = 0; i < foundComments.length; i++) {
+              addComment(foundComments[i]._id, foundComments[i]._postID, foundComments[i].commentContent, foundComments[i].commentAuthor, foundComments[i].relativeTime, foundComments[i].commentScore, foundComments[i].upvote, foundComments[i].downvote);
+            }
+          } else {
+            addNoComments()
+          }
+        })
+      }
+
+      loadPosts();
+      loadComments();
+
+      /////////////////////////////////////////////////////////////////
+
+      function addNoPosts() {
+        var noPosts = document.createElement("div");
+        noPosts.className = "postcomment";
+        var icon = document.createElement("i");
+        icon.className = "material-icons md-orange md-92 flex-fill";
+        icon.innerHTML = "sentiment_very_dissatisfied";
+        var content = document.createElement("div");
+        content.className = "mt-3 mb-3 d-flex flex-column align-contents-center justify-contents-center";
+        var text = document.createElement("h2");
+        text.className = "flex-fill text-center";
+        text.innerHTML = "No posts yet...";
+        var subtext = document.createElement("h6");
+        subtext.className = "mt-1 flex-fill text-center subheading";
+
+        var loggedIn = "{{uname}}";
+        var curUser = "{{username}}";
+
+        if (curUser == loggedIn)
+          subtext.innerHTML = "Looks like you haven't posted anything. Why not <a href='/post/create'>create a post</a> now?";
+        else
+          subtext.innerHTML = "Looks like this user hasn't posted anything.";
+        content.append(icon);
+        content.append(text);
+        content.append(subtext);
+        noPosts.append(content);
+        noPosts.id = "noPost";
+        $("#postContainer").append(noPosts);
+      }
+
+      function addNoComments() {
+        var noComments = document.createElement("div");
+        noComments.className = "postcomment";
+        var icon = document.createElement("i");
+        icon.className = "material-icons md-orange md-92 flex-fill";
+        icon.innerHTML = "sentiment_very_dissatisfied";
+        var content = document.createElement("div");
+        content.className = "mt-3 mb-3 d-flex flex-column align-contents-center justify-contents-center";
+        var text = document.createElement("h2");
+        text.className = "flex-fill text-center";
+        text.innerHTML = "No comments yet...";
+        var subtext = document.createElement("h6");
+        subtext.className = "mt-1 flex-fill text-center subheading";
+
+        var loggedIn = "{{uname}}";
+        var curUser = "{{username}}";
+
+        if (curUser == loggedIn)
+          subtext.innerHTML = "Looks like you haven't commented on anything.";
+        else
+          subtext.innerHTML = "Looks like this user hasn't commented on anything.";
+        content.append(icon);
+        content.append(text);
+        content.append(subtext);
+        noComments.append(content);
+        noComments.id = "noComments";
+        $("#commentContainer").append(noComments);
+
+        $("#loadMoreComments").hide()
+      }
+
+      function addPost(postIDs, postTitle, postDescription, postAuthor, postDate, postScore, commentNumber, upvote, downvote) {
+        var mediaPost = document.createElement("div");
+        mediaPost.className = "media post";
+        var flexRow = document.createElement("div");
+        flexRow.className = "d-flex flex-row w-100";
+        var flexColumn = document.createElement("div");
+        flexColumn.className = "media-body d-flex flex-column";
+        var voteBox = document.createElement("div");
+        voteBox.className = "mr-3 actions flex-column";
+        var arrowUpward = document.createElement("i");
+        arrowUpward.className = "material-icons md-18 md-dark up";
+        arrowUpward.innerHTML = "arrow_upward";
+        arrowUpward.id = "arrow_upward" + postIDs;
+        var upwardSpan = document.createElement("span")
+        upwardSpan.addEventListener("click", function () {
+          console.log("upwardSpan clicked")
+
+          upvotePost(postIDs)
+
+        })
+        upwardSpan.append(arrowUpward);
+
+        var voteValue = document.createElement("span");
+        voteValue.className = "votes";
+        voteValue.id = "votes" + postIDs
+        voteValue.innerHTML = postScore;
+
+        var arrowDownward = document.createElement("i");
+        arrowDownward.className = "material-icons md-18 md-dark down";
+        arrowDownward.innerHTML = "arrow_downward";
+        arrowDownward.id = "arrow_downward" + postIDs
+        var downwardSpan = document.createElement("span")
+        downwardSpan.addEventListener("click", function () {
+          console.log("downwardSpan clicked")
+
+          downvotePost(postIDs)
+        })
+        downwardSpan.append(arrowDownward);
+
+        var commentIcon = document.createElement("i");
+        commentIcon.className = "material-icons md-16 md-dark";
+        commentIcon.innerHTML = "comment";
+        var personIcon = document.createElement("i");
+        personIcon.className = "material-icons md-18 md-dark";
+        personIcon.innerHTML = "person_outline";
+
+        var postTitleContainer = document.createElement("a");
+        postTitleContainer.setAttribute("href", "/post/" + postIDs);
+        postTitleContainer.className = "mt-0 mb-1";
+        postTitleContainer.innerHTML = postTitle;
+
+        var postContent = document.createElement("div");
+        postContent.className = "fade-text"
+        postContent.innerHTML = postDescription;
+
+        var postInfo = document.createElement("div");
+        postInfo.className = "p-1 flex-fill";
+        var spanInfo = document.createElement("span");
+        spanInfo.className = "info";
+        var spanComment = document.createElement("span");
+        spanComment.className = "mr-3";
+        var commentNumberContainer = document.createElement("a");
+        commentNumberContainer.innerHTML = " ";
+        commentNumberContainer.setAttribute("href", "/post/" + postIDs + "#comments");
+        var spanUsername = document.createElement("span");
+        spanUsername.className = "p-1";
+        var userName = document.createElement("a");
+        userName.innerHTML = postAuthor;
+        userName.setAttribute("href", "/user/" + postAuthor);
+
+        //TODO
+        //editspan.setAttribute("data-toggle", "modal");
+        //editspan.setAttribute("data-target", "#editPostModal");
+        //  var edita = document.createElement("a");
+
+        voteBox.append(upwardSpan);
+        voteBox.append(voteValue);
+        voteBox.append(downwardSpan);
+        flexRow.append(voteBox);
+        flexColumn.append(postTitleContainer);
+        flexColumn.append(postContent);
+        commentNumberContainer.append(commentIcon);
+        commentNumberContainer.append(" " + commentNumber + " comments");
+        spanComment.append(commentNumberContainer);
+        spanInfo.append(spanComment);
+        spanUsername.append(personIcon);
+        spanUsername.append("Posted by ");
+        spanUsername.append(userName);
+        spanUsername.append(" at " + postDate);
+        spanInfo.append(spanUsername);
+        postInfo.append(spanInfo);
+        flexColumn.append(postInfo);
+        flexRow.append(flexColumn);
+        mediaPost.append(flexRow);
+
+
+        var curUser = "{{username}}"
+        var loggedIn = "{{uname}}"
+        if (loggedIn)
+          if (curUser === loggedIn) {
+            var icondelete = document.createElement("i");
+            icondelete.innerHTML = "delete";
+            icondelete.className = "material-icons md-22 md-dark icons material-actions";
+
+            var iconedit = document.createElement("i");
+            iconedit.innerHTML = "edit";
+            iconedit.className = "material-icons md-22 md-dark icons material-actions";
+
+            var deletespan = document.createElement("span");
+            deletespan.className = "deleteSpan";
+            deletespan.setAttribute("data-id", postIDs);
+            deletespan.setAttribute("data-toggle", "modal");
+            deletespan.setAttribute("data-target", "#deletePostConfirmation");
+            deletespan.addEventListener("click", function () {
+              document.getElementById("deletePostConfirmation").setAttribute("data-id", postIDs)
+            })
+
+            var editspan = document.createElement("span");
+            editspan.addEventListener("click", function () {
+              window.location.href = "/post/edit/" + postIDs;
+            })
+
+            editspan.append(iconedit);
+            deletespan.append(icondelete);
+            flexRow.append(editspan);
+            flexRow.append(deletespan);
+          }
+
+        for (let i = 0; i < upvote.length; i++) {
+          if (upvote[i] == loggedIn) { // make arrowup orange
+            arrowUpward.setAttribute("style", "color:#F36E21");
+          }
+        }
+
+        for (let i = 0; i < downvote.length; i++) {
+          if (downvote[i] == loggedIn) { // make arrowdown blue
+            arrowDownward.setAttribute("style", "color:#3C8AFF");
+          }
+        }
+
+
+        $("#postContainer").append(mediaPost);
+      }
+
+      function addComment(commentID, postID, commentContent, commentAuthor, commentDate, commentScore, upvote, downvote) {
+
+        var wholeCommentContainer = document.createElement("div");
+        wholeCommentContainer.className = "comment-container";
+        var mainCommentContainer = document.createElement("div");
+        mainCommentContainer.className = "media comment ml-3";
+        var voteContainer = document.createElement("div");
+        voteContainer.className = "mr-3 commentactions";
+        var upArrow = document.createElement("i");
+        upArrow.className = "material-icons md-18 md-dark up";
+        upArrow.innerHTML = "arrow_upward";
+        upArrow.id = "arrow_upward" + commentID;
+        var upwardSpan = document.createElement("span")
+        upwardSpan.addEventListener("click", function () {
+          console.log("COMMENT - upwardSpan clicked")
+
+          upvoteComment(commentID, postID);
+
+        })
+        upwardSpan.append(upArrow);
+
+        var downArrow = document.createElement("i");
+        downArrow.className = "material-icons md-18 md-dark down";
+        downArrow.innerHTML = "arrow_downward";
+        downArrow.id = "arrow_downward" + commentID
+        var downwardSpan = document.createElement("span")
+        downwardSpan.addEventListener("click", function () {
+          console.log("COMMENT - downwardSpan clicked")
+
+          downvoteComment(commentID, postID)
+        })
+        downwardSpan.append(downArrow);
+
+        var commentBodyContainer = document.createElement("div");
+        if (username)
+          commentBodyContainer.className = "media-body";
+        else
+          commentBodyContainer.className = "media-body mb-3";
+        commentBodyContainer.id = postID;
+        var flexContainer = document.createElement("div");
+        flexContainer.className = "d-flex flex-row w-100 justify-content-between";
+        var userNameContainer = document.createElement("h6");
+        userNameContainer.className = "mt-0";
+        var userName = document.createElement("a");
+        userName.setAttribute("href", "/post/" + postID);
+        userName.setAttribute("style", "color : #000000;");
+        userName.innerHTML = commentAuthor;
+        var commentScoreContainer = document.createElement("span");
+        commentScoreContainer.className = "ml-2 points";
+        commentScoreContainer.innerHTML = commentScore + " points";
+        commentScoreContainer.id = "votes" + commentID
+        var separator = document.createElement("span");
+        separator.className = "ml-2";
+        separator.innerHTML = "·";
+        var commentDateContainer = document.createElement("span");
+        commentDateContainer.className = "ml-2 points";
+        commentDateContainer.innerHTML = commentDate;
+        var commentContentContainer = document.createElement("div");
+        commentContentContainer.innerHTML = commentContent;
+        var navContainer = document.createElement("div");
+        navContainer.className = "mt-2";
+        var infoSpan = document.createElement("span");
+        infoSpan.className = "info";
+        /*
+        var replyLink = document.createElement("a");
+        replyLink.setAttribute("href", "#");
+        replyLink.setAttribute("data-id", postID);
+        replyLink.addEventListener("click", function () {
+          var id = $(this).attr("data-id")
+          console.log("Reply clicked, id=" + id);
+
+          var addCommentContainer = document.createElement("div")
+          
+          var txtComment = document.createElement("textarea")
+          txtComment.setAttribute("oninput", "checkCommentBox();")
+          txtComment.className = "form-control mt-2"
+          txtComment.type = "text"
+          txtComment.placeholder = "Type a comment"
+
+          var btnSubmit = document.createElement("button")
+          btnSubmit.disabled = true
+          btnSubmit.setAttribute("onclick", "createNewComment()")
+          btnSubmit.className = "btn btn-primary mt-2"
+          btnSubmit.innerHTML = "Submit"
+
+          var txtCommentContainer = document.createElement("div")
+          txtCommentContainer.className = "container-fluid"
+
+          txtCommentContainer.append(txtComment)
+          txtCommentContainer.append(btnSubmit)
+
+       
+          addCommentContainer.append(txtCommentContainer)
+
+          $(txtCommentContainer).appendTo(txtContainer).hide().slideDown(500)
+        }, {
+            once: true
+          })
+          
+        var commentIcon = document.createElement("i");
+        commentIcon.className = "material-icons md-16 md-dark";
+        commentIcon.innerHTML = "comment";
+        var replyText = document.createElement("span");
+        replyText.innerHTML = "Reply";
+*/
+        var txtContainer = document.createElement("div")
+
+        voteContainer.append(upwardSpan);
+        voteContainer.append(downwardSpan);
+        userNameContainer.append(userName);
+
+        var flexColumnInfo = document.createElement("div");
+        flexColumnInfo.className = "d-flex flex-row";
+        flexColumnInfo.append(userNameContainer);
+        flexColumnInfo.append(commentScoreContainer);
+        flexColumnInfo.append(separator);
+        flexColumnInfo.append(commentDateContainer);
+
+        flexContainer.append(flexColumnInfo);
+
+        var curUser = "{{username}}"
+        var loggedIn = "{{uname}}"
+        if (loggedIn)
+          if (curUser === loggedIn) {
+            var icondelete = document.createElement("i");
+            icondelete.innerHTML = "delete";
+            icondelete.className = "material-icons md-22 md-dark icons material-actions";
+
+            var iconedit = document.createElement("i");
+            iconedit.innerHTML = "edit";
+            iconedit.className = "material-icons md-22 md-dark icons material-actions";
+
+            var deletespan = document.createElement("span");
+            deletespan.className = "deleteSpan";
+            deletespan.setAttribute("data-postID", postID);
+            deletespan.setAttribute("data-toggle", "modal");
+            deletespan.setAttribute("data-target", "#deleteCommentConfirmation");
+            deletespan.addEventListener("click", function () {
+
+              document.getElementById("deleteCommentModal").setAttribute("data-postID", postID)
+              document.getElementById("deleteCommentModal").setAttribute("data-commentID", commentID)
+
+            })
+
+            var editspan = document.createElement("span");
+            editspan.addEventListener("click", function () {
+              $("#inputCommentContent").val(commentContent)
+            })
+
+            editspan.setAttribute("data-toggle", "modal");
+            editspan.setAttribute("data-target", "#editCommentModal");
+            editspan.addEventListener("click", function () {
+
+              document.getElementById("editCommentModal").setAttribute("data-commentID", commentID)
+              document.getElementById("editCommentModal").setAttribute("data-postID", postID)
+            })
+
+
+
+
+
+            editspan.append(iconedit);
+            deletespan.append(icondelete);
+
+            var flexColumnActions = document.createElement("div");
+            flexColumnActions.className = "d-flex flex-row";
+            flexColumnActions.append(editspan);
+            flexColumnActions.append(deletespan);
+
+            flexContainer.append(flexColumnActions);
+          }
+
+
+        /*
+        if (username) {
+          replyLink.append(commentIcon);
+          replyLink.append(replyText);
+          infoSpan.append(replyLink);
+          navContainer.append(infoSpan);
+        }
+        */
+        for (let i = 0; i < upvote.length; i++) {
+          if (upvote[i] == loggedIn) { // make arrowup orange
+            upArrow.setAttribute("style", "color:#F36E21");
+          }
+        }
+
+        for (let i = 0; i < downvote.length; i++) {
+          if (downvote[i] == loggedIn) { // make arrowdown blue
+            downArrow.setAttribute("style", "color:#3C8AFF");
+          }
+        }
+
+        commentBodyContainer.append(flexContainer);
+        commentBodyContainer.append(commentContentContainer);
+        commentBodyContainer.append(navContainer);
+        commentBodyContainer.append(txtContainer)
+        mainCommentContainer.append(voteContainer);
+        mainCommentContainer.append(commentBodyContainer);
+        wholeCommentContainer.append(mainCommentContainer);
+
+        wholeCommentContainer.addEventListener("click", function () {
+          window.location.href = "/post/"+postID;
+        })
+
+        $("#commentContainer").append(wholeCommentContainer);
+      }
+
+      $("#savechanges").on("click", function (evt) {
+        var postID = $("#editCommentModal").attr("data-postID")
+        var commentID = $("#editCommentModal").attr("data-commentID")
+        var commentContent = $("#inputCommentContent").val();
+
+        updateComment(postID, commentID, commentContent)
+      })
+
+      $('#deletePostModal').on('click', function (evt) {
+        var id = $(this).attr("data-id")
+        deletePost(id)
+      }
+      );
+
+      $('#deleteCommentModal').on('click', function (evt) {
+        var postid = $(this).attr("data-postID")
+        var commentid = $(this).attr("data-commentID")
+
+        deleteComment(postid, commentid)
+      });
+
+      function upvoteComment(commentID, postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("comment/upComment", {
+            commentID: commentID,
+            postID: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+
+              $('#arrow_downward' + commentID).css({ color: "lightgray" });
+              $('#arrow_upward' + commentID).css({ color: "#F36E21" });
+
+              for (let i = 0; i < foundUser.comment.length; i++) {
+                if (foundUser.comment[i]._id == commentID) {
+                  document.getElementById("votes" + commentID).innerHTML = foundUser.comment[i].commentScore + " points";
+                }
+              }
+            }
+            else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#upvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function downvoteComment(commentID, postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("comment/downComment", {
+            commentID: commentID,
+            postID: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+              $('#arrow_upward' + commentID).css({ color: "lightgray" });
+              $('#arrow_downward' + commentID).css({ color: "#3C8AFF" });
+
+              for (let i = 0; i < foundUser.comment.length; i++) {
+                if (foundUser.comment[i]._id == commentID) {
+                  document.getElementById("votes" + commentID).innerHTML = foundUser.comment[i].commentScore + " points";
+                }
+              }
+              //set to blue
+            } else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#downvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function updateComment(postID, commentID, commentContent) {
+        var username = "{{username}}";
+        $("#commentContainer").empty();
+
+        $.post("post/updateComment", {
+          postID: postID,
+          commentID: commentID,
+          commentContent: commentContent,
+          username: username
+        }, (foundUser) => {
+          loadComments();
+        })
+
+      }
+
+      function upvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/upPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+
+              $('#arrow_downward' + postID).css({ color: "lightgray" });
+              $('#arrow_upward' + postID).css({ color: "#F36E21" });
+              document.getElementById("votes" + postID).innerHTML = foundUser.postScore;
+            }
+            else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#upvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function downvotePost(postID) {
+        var username = "{{uname}}";
+
+        if (!username) {
+          $("#voteLoginError").modal("show");
+        } else {
+          $.post("post/downPost", {
+            id: postID,
+            username: username
+          }, (foundUser) => {
+            if (foundUser) {
+              $('#arrow_upward' + postID).css({ color: "lightgray" });
+              $('#arrow_downward' + postID).css({ color: "#3C8AFF" });
+              document.getElementById("votes" + postID).innerHTML = foundUser.postScore;
+              //set to blue
+            } else { // foundUser is null, username already in the array, na upvote na yung post ng user na yun
+              $("#downvoteOnce").modal("show")
+            }
+          })
+        }
+      }
+
+      function deleteComment(postID, commentID) {
+        var username = "{{username}}";
+        $("#commentContainer").empty();
+
+        $.post("post/deletecomment", {
+          postID: postID,
+          commentID: commentID,
+          username: username
+        }, (foundUser) => { // returns the users list of comments after deleting the said post already
+          window.location.href = "/user/{{username}}";
+        })
+      }
+
+      function deletePost(postID) {
+        var username = "{{username}}";
+
+        $("#postContainer").empty();
+        $.post("post/deletepost", {
+          id: postID,
+          username: username
+        }, (deletedPost) => { // returns the users list of post after deleting the said post already
+          $("#commentContainer").empty();
+          $.post("/user/comments", {
+            username: username
+          }, (foundComments) => {
+            window.location.href = "/user/{{username}}";
+          })
+        })
+
+      }
+
+      $("#deletePostConfirmation").on('show.bs.modal', function (e) {
+        console.log("show delete post modal")
+        var postID = $(e.relatedTarget).data('id');
+        $("#btnDeletePost").attr("id", postID);
+      })
+
+      $("#btnDeletePost").on("click", function () {
+        var postID = $(this).attr("id")
+        deletePost(postID);
+      })
+    });
+  </script>
+
+</body>
+
+</html>
